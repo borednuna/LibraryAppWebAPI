@@ -15,7 +15,6 @@ public class BorrowingRecordService(
     private readonly IBookRepository _bookRepository = bookRepository;
     private readonly IMemberRepository _memberRepository = memberRepository;
 
-    // CRUD
     public async Task<IEnumerable<BorrowingRecord>> GetAllBorrowingRecordsAsync()
     {
         return await _borrowingRecordRepository.GetAllAsync();

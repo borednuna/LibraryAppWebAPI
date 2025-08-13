@@ -1,14 +1,19 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using LibraryAppWebAPI.Enums;
+using Microsoft.AspNetCore.Identity;
+
 namespace LibraryAppWebAPI.Models;
 
-public class Member
+public class Member : IdentityUser
 {
-    public int Id { get; set; }
+    [Required]
     public Guid MembershipId { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string? Password { get; set; }
-    public DateTime MembershipDate { get; set; }
+
+    [Required]
+    public DateTime MembershipDate { get; set; } = DateTime.UtcNow;
+
     public bool IsActive { get; set; } = true;
-    
+
     public virtual ICollection<BorrowingRecord> BorrowingHistory { get; set; } = new List<BorrowingRecord>();
 }

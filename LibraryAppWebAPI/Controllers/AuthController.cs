@@ -1,26 +1,235 @@
+using FluentValidation;
+using JWTAuthAPI.Dtos;
 using LibraryAppWebAPI.DTOs;
+using LibraryAppWebAPI.Models;
 using LibraryAppWebAPI.Services.Interfaces;
+using LibraryAppWebAPI.Validators;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryAppWebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController : ControllerBase
 {
-    private readonly IAuthService _authService = authService;
+    private readonly UserManager<Member> _userManager;
+    private readonly SignInManager<Member> _signInManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly ITokenService _tokenService;
+    // private readonly ILogger<AuthController> _logger;
 
-    [HttpPost]
-    public async Task<IActionResult> SignUp(SignUpDtos signUpDto)
+    public AuthController(
+        UserManager<Member> userManager,
+        SignInManager<Member> signInManager,
+        RoleManager<IdentityRole> roleManager,
+        ITokenService tokenService
+        // ILogger<AuthController> logger
+    )
+    {
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _roleManager = roleManager;
+        _tokenService = tokenService;
+        // _logger = logger;
+    }
+
+    /// <summary>
+    /// Register a new user account using Microsoft Identity's built-in user management
+    /// This is like signing up for a new account with enterprise-grade security
+    /// </summary>
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+    {
+        // try
+        // {
+            // Check if user already exists using Identity's UserManager
+            var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
+            if (existingUser != null)
+            {
+                return Conflict(new { message = "Email is already registered." });
+            }
+
+            // Create new user with Identity's built-in validation and security
+            var newUser = new Member
+            {
+                UserName = registerDto.UserName, // Identity uses UserName for login
+                Email = registerDto.Email,
+                MembershipId = Guid.NewGuid(),
+                EmailConfirmed = true // For demo purposes, auto-confirm email
+            };
+
+            // Identity handles password hashing, validation, and security automatically
+            var result = await _userManager.CreateAsync(newUser, registerDto.Password);
+
+            if (!result.Succeeded)
+            {
+                // Return Identity's validation errors
+                var errors = result.Errors.Select(e => e.Description);
+                return BadRequest(new { message = "Registration failed", errors });
+            }
+
+            // Assign default "User" role to new registrations
+            await _userManager.AddToRoleAsync(newUser, "User");
+
+            // _logger.LogInformation("User {Email} registered successfully", registerDto.Email);
+
+            return CreatedAtAction(nameof(GetProfile), new { }, new
+            {
+                message = "User registered successfully",
+                userId = newUser.Id,
+                email = newUser.Email
+            });
+        // }
+        // catch (Exception ex)
+        // {
+        //     // _logger.LogError(ex, "Error during user registration for {Email}", registerDto.Email);
+        //     return StatusCode(500, new { message = "Registration failed due to server error" });
+        // }
+    }
+
+    /// <summary>
+    /// Login endpoint using Microsoft Identity's SignInManager
+    /// This validates credentials and issues JWT tokens with Identity's security features
+    /// </summary>
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
         try
         {
-            var memberDto = await _authService.SignUpAsync(signUpDto);
-            return Ok();
+            // Find user by email using Identity's UserManager
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            if (user == null)
+            {
+                // _logger.LogWarning("Login attempt with non-existent email: {Email}", loginDto.Email);
+                return Unauthorized(new { message = "Invalid credentials." });
+            }
+
+            // Use Identity's SignInManager to validate password with built-in security features
+            // This handles lockouts, two-factor auth, and other security policies
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, lockoutOnFailure: true);
+
+            if (!result.Succeeded)
+            {
+                // _logger.LogWarning("Failed login attempt for user: {Email}", loginDto.Email);
+                
+                if (result.IsLockedOut)
+                    return Unauthorized(new { message = "Account is locked out." });
+                
+                return Unauthorized(new { message = "Invalid credentials." });
+            }
+
+            // Get user roles using Identity's UserManager
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // Generate JWT token
+            var token = _tokenService.GenerateToken(user, roles.ToList());
+
+            // _logger.LogInformation("User {Email} logged in successfully", user.Email);
+
+            return Ok(new AuthResponseDto
+            {
+                Token = token,
+                Email = user.Email ?? "",
+                UserName = user.UserName ?? "Default User",
+                Roles = roles.ToList(),
+                ExpiresAt = DateTime.UtcNow.AddDays(1) // Should match token expiration
+            });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "An error occurred while retrieving books", error = ex.Message });
+            // _logger.LogError(ex, "Error during login for {Email}", loginDto.Email);
+            return StatusCode(500, new { message = "Login failed due to server error" });
+        }
+    }
+
+    /// <summary>
+    /// Get current user profile information
+    /// This endpoint requires authentication (JWT token)
+    /// </summary>
+    [HttpGet("profile")]
+    [Authorize] // This attribute requires a valid JWT token
+    public async Task<IActionResult> GetProfile()
+    {
+        try
+        {
+            // Get current user from JWT claims using Identity
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return Unauthorized(new { message = "Invalid token." });
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            // Get user roles
+            var roles = await _userManager.GetRolesAsync(user);
+            return Ok(new MemberDto
+            {
+                Email = user.Email ?? "",
+                UserName = user.UserName ?? "Default User",
+                Roles = roles.ToList()
+            });
+        }
+        catch (Exception ex)
+        {
+            // _logger.LogError(ex, "Error retrieving user profile");
+            return StatusCode(500, new { message = "Failed to retrieve profile" });
+        }
+    }
+
+    /// <summary>
+    /// Admin-only endpoint to demonstrate role-based authorization
+    /// This shows how to protect endpoints based on user roles
+    /// </summary>
+    [HttpGet("admin-only")]
+    [Authorize(Roles = "Admin")]
+    public IActionResult AdminOnly()
+    {
+        var userName = User.Identity?.Name;
+        return Ok(new { 
+            message = "Welcome to the admin area!", 
+            user = userName,
+            timestamp = DateTime.UtcNow 
+        });
+    }
+
+    /// <summary>
+    /// Get all registered users (Admin only)
+    /// This demonstrates how to use UserManager for user management operations
+    /// </summary>
+    [HttpGet("users")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        try
+        {
+            var users = _userManager.Users.ToList();
+            var userProfiles = new List<MemberDto>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userProfiles.Add(new MemberDto
+                {
+                    Email = user.Email ?? "",
+                    UserName = user.UserName ?? "Default User",
+                    Roles = roles.ToList()
+                });
+            }
+
+            return Ok(userProfiles);
+        }
+        catch (Exception ex)
+        {
+            // _logger.LogError(ex, "Error retrieving all users");
+            return StatusCode(500, new { message = "Failed to retrieve users" });
         }
     }
 }
+

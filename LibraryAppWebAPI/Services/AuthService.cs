@@ -1,47 +1,63 @@
-namespace LibraryAppWebAPI.Services;
-
+using AutoMapper;
+using JWTAuthAPI.Dtos;
 using LibraryAppWebAPI.DTOs;
 using LibraryAppWebAPI.Models;
-using LibraryAppWebAPI.Repositories.Interfaces;
 using LibraryAppWebAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
-public class AuthService(IMemberRepository memberRepository) : IAuthService
+namespace LibraryAppWebAPI.Services;
+
+public class AuthService : IAuthService
 {
-    private readonly IMemberRepository _memberRepository = memberRepository;
+    private readonly UserManager<Member> _userManager;
+    private readonly SignInManager<Member> _signInManager;
+    private readonly IMapper _mapper;
 
-    public async Task<Member?> LoginAsync(string email, string password)
+    public AuthService(UserManager<Member> userManager, SignInManager<Member> signInManager, IMapper mapper)
     {
-        var members = await _memberRepository.GetAllAsync();
-        var user = members.FirstOrDefault(m => 
-            m.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _mapper = mapper;
+    }
 
-        if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
-            return user;
-
+    public async Task<Member?> LoginAsync(LoginDto loginDto)
+    {
+        var user = await _userManager.FindByEmailAsync(loginDto.Email);
+        if (user != null)
+        {
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            if (result.Succeeded)
+                return user;
+        }
         return null;
     }
 
-    public async Task<Member> SignUpAsync(SignUpDtos signUpDto)
+    public async Task<Member> SignUpAsync(RegisterDto registerDto)
     {
-        if (await IsEmailRegisteredAsync(signUpDto.Email))
+        if (await _userManager.FindByEmailAsync(registerDto.Email) != null)
             throw new InvalidOperationException("Email is already registered.");
 
-        var member = new Member
-        {
-            Name = signUpDto.Name,
-            Email = signUpDto.Email,
-            Password = BCrypt.Net.BCrypt.HashPassword(signUpDto.Password),
-            MembershipDate = new DateTime(),
-            MembershipId = Guid.NewGuid(),
-            IsActive = true
-        };
+        var member = _mapper.Map<Member>(registerDto);
+        member.MembershipId = Guid.NewGuid();
+        member.MembershipDate = DateTime.UtcNow;
+        member.IsActive = true;
 
-        return await _memberRepository.AddAsync(member);
+        var result = await _userManager.CreateAsync(member, registerDto.Password);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to create user: {errors}");
+        }
+
+        // Optionally, assign default role
+        await _userManager.AddToRoleAsync(member, "Regular");
+
+        return member;
     }
 
     public async Task<bool> IsEmailRegisteredAsync(string email)
     {
-        var members = await _memberRepository.GetAllAsync();
-        return members.Any(m => m.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        var user = await _userManager.FindByEmailAsync(email);
+        return user != null;
     }
 }

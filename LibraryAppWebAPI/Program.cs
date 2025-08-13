@@ -1,28 +1,68 @@
+using System.Text;
+using AutoMapper.Execution;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using LibraryAppWebAPI.Data;
+using LibraryAppWebAPI.MappingProfiles;
+using LibraryAppWebAPI.Models;
 using LibraryAppWebAPI.Repositories;
 using LibraryAppWebAPI.Repositories.Interfaces;
 using LibraryAppWebAPI.Services;
 using LibraryAppWebAPI.Services.Interfaces;
+using LibraryAppWebAPI.Validators;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseSqlite("Data Source=LibraryDatabase.db"));
 
+builder.Services.AddIdentity<LibraryAppWebAPI.Models.Member, IdentityRole>()
+    .AddEntityFrameworkStores<LibraryDbContext>()
+    .AddDefaultTokenProviders();
+
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateLifetime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"] ??
+                throw new InvalidOperationException("JWT SecretKey not configured"))),
+        ValidateIssuerSigningKey = true,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
 builder.Services.AddScoped<IBookRepository, BookRepository>();
-builder.Services.AddScoped<IBookService, BookService>();
-
-builder.Services.AddScoped<IRackRepository, RackRepository>();
-builder.Services.AddScoped<IRackService, RackService>();
-
-builder.Services.AddScoped<IMemberRepository, MemberRepository>();
-builder.Services.AddScoped<IMemberService, MemberService>();
-
 builder.Services.AddScoped<IBorrowingRecordRepository, BorrowingRecordRepository>();
-builder.Services.AddScoped<IBorrowingRecordService, BorrowingRecordService>();
+builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<IBorrowingRecordService, BorrowingRecordService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddAutoMapper(typeof(BookMappingProfile));
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+
+builder.Services.AddTransient<IValidator<LibraryAppWebAPI.Models.Member>, MemberValidator>();
 
 builder.Services.AddControllers()
 .AddJsonOptions(options =>
@@ -67,6 +107,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowAll");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

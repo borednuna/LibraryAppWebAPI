@@ -1,10 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using LibraryAppWebAPI.Enums;
 
-namespace LibraryAppWebAPI.Models;
+namespace LibraryAppWebAPI.DTOs;
 
-public class Book
+public class BookDto
 {
     public int Id { get; set; }
 
@@ -21,10 +20,7 @@ public class Book
     [RegularExpression(@"^\d{10}(\d{3})?$", ErrorMessage = "ISBN must be numeric, 10 or 13 digits")]
     public string ISBN { get; set; } = string.Empty;
 
-    public DateTime? DeletedAt { get; set; }
 
     [Required(ErrorMessage = "Genre is required")]
     public Genre Genre { get; set; }
-
-    public virtual ICollection<BorrowingRecord> BorrowingHistory { get; set; } = new List<BorrowingRecord>();
 }

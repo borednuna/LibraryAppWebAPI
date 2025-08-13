@@ -14,7 +14,7 @@ public class MemberRepository(LibraryDbContext context) : IMemberRepository
 
     public async Task<Member?> GetByIdAsync(int id)
     {
-        return await _context.Members.FirstOrDefaultAsync(m => m.Id == id);
+        return await _context.Members.FirstOrDefaultAsync(m => m.Id == id.ToString());
     }
 
     public async Task<Member?> GetByMembershipIdAsync(Guid membershipId)
@@ -42,7 +42,7 @@ public class MemberRepository(LibraryDbContext context) : IMemberRepository
 
         existingMember.Id = member.Id;
         existingMember.IsActive = member.IsActive;
-        existingMember.Name = member.Name;
+        existingMember.UserName = member.UserName;
 
         await _context.SaveChangesAsync();
         return existingMember;
@@ -61,6 +61,6 @@ public class MemberRepository(LibraryDbContext context) : IMemberRepository
 
     public async Task<bool> ExistsAsync(int id)
     {
-        return await _context.Members.AnyAsync(m => m.Id == id);
+        return await _context.Members.AnyAsync(m => m.Id == id.ToString());
     }
 }

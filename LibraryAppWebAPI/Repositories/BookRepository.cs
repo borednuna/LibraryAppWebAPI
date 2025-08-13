@@ -58,9 +58,6 @@ namespace LibraryAppWebAPI.Repositories
             existingBook.Title = book.Title;
             existingBook.Author = book.Author;
             existingBook.ISBN = book.ISBN;
-            existingBook.PublicationDate = book.PublicationDate;
-            existingBook.Publisher = book.Publisher;
-            existingBook.RackId = book.RackId;
             existingBook.Genre = book.Genre;
 
             await _context.SaveChangesAsync();
