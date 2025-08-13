@@ -1,5 +1,6 @@
 namespace LibraryAppWebAPI.Services;
 
+using LibraryAppWebAPI.DTOs;
 using LibraryAppWebAPI.Models;
 using LibraryAppWebAPI.Repositories.Interfaces;
 using LibraryAppWebAPI.Services.Interfaces;
@@ -20,17 +21,17 @@ public class AuthService(IMemberRepository memberRepository) : IAuthService
         return null;
     }
 
-    public async Task<Member> SignUpAsync(string name, string email, string password, DateTime membershipDate)
+    public async Task<Member> SignUpAsync(SignUpDtos signUpDto)
     {
-        if (await IsEmailRegisteredAsync(email))
+        if (await IsEmailRegisteredAsync(signUpDto.Email))
             throw new InvalidOperationException("Email is already registered.");
 
         var member = new Member
         {
-            Name = name,
-            Email = email,
-            Password = BCrypt.Net.BCrypt.HashPassword(password),
-            MembershipDate = membershipDate,
+            Name = signUpDto.Name,
+            Email = signUpDto.Email,
+            Password = BCrypt.Net.BCrypt.HashPassword(signUpDto.Password),
+            MembershipDate = new DateTime(),
             MembershipId = Guid.NewGuid(),
             IsActive = true
         };
