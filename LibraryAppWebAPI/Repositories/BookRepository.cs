@@ -67,11 +67,13 @@ namespace LibraryAppWebAPI.Repositories
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var book = await _context.Books.FindAsync(id);
+            var book = await _context.Books
+                .FirstOrDefaultAsync(b => b.Id == id && b.DeletedAt == null);
+
             if (book == null)
                 return false;
 
-            book.DeletedAt = new DateTime();
+            book.DeletedAt = DateTime.Now;
 
             await _context.SaveChangesAsync();
             return true;

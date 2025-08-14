@@ -45,7 +45,11 @@ namespace LibraryAppWebAPI.Services
 
         public async Task<BookDto?> UpdateBookAsync(BookDto bookDto)
         {
-            var existing = await _bookRepository.GetByIdAsync(bookDto.Id);
+            if (bookDto.Id == null)
+            {
+                return null;
+            }
+            var existing = await _bookRepository.GetByIdAsync((int)bookDto.Id);
             if (existing == null) return null;
 
             _mapper.Map(bookDto, existing);
