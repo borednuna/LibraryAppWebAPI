@@ -120,12 +120,14 @@
 
 .modal h3 {
   margin-bottom: 10px;
+  color: black;
 }
 
 .modal label {
   display: block;
   font-weight: bold;
   margin-top: 10px;
+  color: black;
 }
 
 .modal input {
@@ -167,4 +169,8 @@
 
 .btn-save:hover {
   background-color: #0056b3;
+}
+
+p {
+  color: black;
 }

@@ -6,6 +6,7 @@ import Auth from './components/auth/Auth';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Logout from './components/logout/Logout';
+import CreateBookForm from './components/createBookForm/CreateBookForm';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -40,6 +41,11 @@ function App() {
         <Auth onLogin={handleLogin} />
         :
         <Logout />
+      }
+      {token ?
+        <CreateBookForm />
+        :
+        <p>Login as admin to create book</p>
       }
       <Catalogue items={books} />
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
