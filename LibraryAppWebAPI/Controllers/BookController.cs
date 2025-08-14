@@ -78,7 +78,7 @@ public class BookController(IBookService bookService, IValidator<BookDto> bookVa
 
     [HttpPut]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BookDto>> UpdateBook(BookDto bookDto)
+    public async Task<ActionResult<BookDto>> UpdateBook([FromBody] BookDto bookDto)
     {
         if (!ModelState.IsValid)
         {

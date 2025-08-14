@@ -60,9 +60,9 @@ public class LibraryDbContext : IdentityDbContext<Member>  // remove custom Role
         );
 
         modelBuilder.Entity<Book>().HasData(
-            new Book { Id = 1, Author = "J.K. Rowling", Genre = Genre.FANTASY, ISBN = "9781856134033", Title = "Harry Potter and The Philosopher's Stone" },
-            new Book { Id = 2, Author = "J.R.R. Tolkien", Genre = Genre.FANTASY, ISBN = "9780261103573", Title = "The Fellowship of the Ring" },
-            new Book { Id = 3, Author = "George Orwell", Genre = Genre.FICTION, ISBN = "9780451524935", Title = "1984" },
+            new Book { Id = 1, Author = "J.K. Rowling", Genre = Genre.FANTASY, ISBN = "9781856134033", Title = "Harry Potter and The Philosopher's Stone", Image = "https://res.cloudinary.com/bloomsbury-atlas/image/upload/w_568,c_scale/jackets/9781408855652.jpg" },
+            new Book { Id = 2, Author = "J.R.R. Tolkien", Genre = Genre.FANTASY, ISBN = "9780261103573", Title = "The Fellowship of the Ring", Image = "https://tse2.mm.bing.net/th/id/OIP.oTPMvgxGtxrr3b2To9BFZQHaLh?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" },
+            new Book { Id = 3, Author = "George Orwell", Genre = Genre.FICTION, ISBN = "9780451524935", Title = "1984", Image = "https://cdn.kobo.com/book-images/c9472126-7f96-402d-ba57-5ba4c0f4b238/1200/1200/False/nineteen-eighty-four-1984-george.jpg" },
             new Book { Id = 4, Author = "Harper Lee", Genre = Genre.FICTION, ISBN = "9780061120084", Title = "To Kill a Mockingbird" },
             new Book { Id = 5, Author = "Mary Shelley", Genre = Genre.HORROR, ISBN = "9780141439471", Title = "Frankenstein" },
             new Book { Id = 6, Author = "Isaac Asimov", Genre = Genre.SCIENCE_FICTION, ISBN = "9780553293357", Title = "Foundation" },

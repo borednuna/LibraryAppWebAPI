@@ -1,0 +1,42 @@
+.list-container {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 400px;
+}
+
+.list-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.list-item:hover {
+  background-color: #f0f0f0;
+}
+
+.list-item-image {
+  width: 60px;
+  height: 90px;
+  object-fit: cover;
+  margin-right: 10px;
+  border-radius: 4px;
+}
+
+.list-item-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+}
+
+.list-item-info p {
+  margin: 2px 0;
+  font-size: 0.85rem;
+}
+
+.list-empty {
+  color: #888;
+  font-style: italic;
+}

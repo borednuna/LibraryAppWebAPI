@@ -20,6 +20,7 @@ public class Book
     [StringLength(13, MinimumLength = 10, ErrorMessage = "ISBN must be between 10 and 13 characters")]
     [RegularExpression(@"^\d{10}(\d{3})?$", ErrorMessage = "ISBN must be numeric, 10 or 13 digits")]
     public string ISBN { get; set; } = string.Empty;
+    public string? Image { get; set; } = string.Empty;
 
     public DateTime? DeletedAt { get; set; }
 

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryAppWebAPI.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20250813185003_InitialCreate")]
+    [Migration("20250814023605_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -42,6 +42,9 @@ namespace LibraryAppWebAPI.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Image")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -61,6 +64,7 @@ namespace LibraryAppWebAPI.Migrations
                             Author = "J.K. Rowling",
                             Genre = 4,
                             ISBN = "9781856134033",
+                            Image = "https://res.cloudinary.com/bloomsbury-atlas/image/upload/w_568,c_scale/jackets/9781408855652.jpg",
                             Title = "Harry Potter and The Philosopher's Stone"
                         },
                         new
@@ -69,6 +73,7 @@ namespace LibraryAppWebAPI.Migrations
                             Author = "J.R.R. Tolkien",
                             Genre = 4,
                             ISBN = "9780261103573",
+                            Image = "https://tse2.mm.bing.net/th/id/OIP.oTPMvgxGtxrr3b2To9BFZQHaLh?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
                             Title = "The Fellowship of the Ring"
                         },
                         new
@@ -77,6 +82,7 @@ namespace LibraryAppWebAPI.Migrations
                             Author = "George Orwell",
                             Genre = 0,
                             ISBN = "9780451524935",
+                            Image = "https://cdn.kobo.com/book-images/c9472126-7f96-402d-ba57-5ba4c0f4b238/1200/1200/False/nineteen-eighty-four-1984-george.jpg",
                             Title = "1984"
                         },
                         new
@@ -85,6 +91,7 @@ namespace LibraryAppWebAPI.Migrations
                             Author = "Harper Lee",
                             Genre = 0,
                             ISBN = "9780061120084",
+                            Image = "",
                             Title = "To Kill a Mockingbird"
                         },
                         new
@@ -93,6 +100,7 @@ namespace LibraryAppWebAPI.Migrations
                             Author = "Mary Shelley",
                             Genre = 7,
                             ISBN = "9780141439471",
+                            Image = "",
                             Title = "Frankenstein"
                         },
                         new
@@ -101,6 +109,7 @@ namespace LibraryAppWebAPI.Migrations
                             Author = "Isaac Asimov",
                             Genre = 3,
                             ISBN = "9780553293357",
+                            Image = "",
                             Title = "Foundation"
                         },
                         new
@@ -109,6 +118,7 @@ namespace LibraryAppWebAPI.Migrations
                             Author = "Douglas Adams",
                             Genre = 3,
                             ISBN = "9780345391803",
+                            Image = "",
                             Title = "The Hitchhiker's Guide to the Galaxy"
                         },
                         new
@@ -117,6 +127,7 @@ namespace LibraryAppWebAPI.Migrations
                             Author = "Leo Tolstoy",
                             Genre = 0,
                             ISBN = "9780199232765",
+                            Image = "",
                             Title = "War and Peace"
                         },
                         new
@@ -125,6 +136,7 @@ namespace LibraryAppWebAPI.Migrations
                             Author = "Mark Twain",
                             Genre = 0,
                             ISBN = "9780486280615",
+                            Image = "",
                             Title = "Adventures of Huckleberry Finn"
                         },
                         new
@@ -133,6 +145,7 @@ namespace LibraryAppWebAPI.Migrations
                             Author = "Jane Austen",
                             Genre = 5,
                             ISBN = "9780141439518",
+                            Image = "",
                             Title = "Pride and Prejudice"
                         });
                 });
