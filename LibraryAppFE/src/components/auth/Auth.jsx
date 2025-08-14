@@ -1,35 +1,48 @@
 import React, { useState } from 'react';
 import './Auth.css';
 import AuthService from '../../services/authService';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Auth = ({ onLogin }) => {
   const [activeTab, setActiveTab] = useState('login'); 
   const [email, setEmail] = useState('');
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
     if (!email || !password || (activeTab === 'signup' && !userName)) {
-      setError('All fields are required.');
+      toast.error('⚠️ All fields are required.');
       return;
     }
 
     setLoading(true);
+    let data;
+
     try {
-      let data;
       if (activeTab === 'login') {
         data = await AuthService.login({ email, password });
       } else {
         data = await AuthService.register({ email, password, userName });
+        toast.success('🎉 Signup successful! You can now log in.');
       }
+
       onLogin(data);
     } catch (err) {
-      setError(err.message || `${activeTab} failed`);
+      let errorMessage = '';
+
+      if (err.errors && Array.isArray(err.errors)) {
+        errorMessage = err.errors.join(' ');
+      } else if (err.message) {
+        errorMessage = err.message;
+      } else {
+        errorMessage = `${activeTab} failed`;
+      }
+
+      toast.error(`❌ ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -52,7 +65,7 @@ const Auth = ({ onLogin }) => {
             Signup
           </button>
         </div>
-        {error && <p className="error">{error}</p>}
+
         <form onSubmit={handleSubmit}>
           <div>
             <label>Email:</label>
@@ -63,6 +76,7 @@ const Auth = ({ onLogin }) => {
               required
             />
           </div>
+
           {activeTab === 'signup' && (
             <div>
               <label>Username:</label>
@@ -74,6 +88,7 @@ const Auth = ({ onLogin }) => {
               />
             </div>
           )}
+
           <div>
             <label>Password:</label>
             <input
@@ -83,8 +98,15 @@ const Auth = ({ onLogin }) => {
               required
             />
           </div>
+
           <button type="submit" disabled={loading}>
-            {loading ? (activeTab === 'login' ? 'Logging in...' : 'Signing up...') : activeTab === 'login' ? 'Login' : 'Signup'}
+            {loading
+              ? activeTab === 'login'
+                ? 'Logging in...'
+                : 'Signing up...'
+              : activeTab === 'login'
+              ? 'Login'
+              : 'Signup'}
           </button>
         </form>
       </div>

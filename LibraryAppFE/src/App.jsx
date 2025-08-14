@@ -3,6 +3,9 @@ import './App.css'
 import Catalogue from './components/catalogue/Catalogue';
 import BookService from './services/bookService';
 import Auth from './components/auth/Auth';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Logout from './components/logout/Logout';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -15,8 +18,6 @@ function App() {
         setBooks(data);
       } catch (err) {
         console.log(err);
-      } finally {
-        // setLoading(false);
       }
     }
 
@@ -25,24 +26,23 @@ function App() {
 
   const handleLogin = (data) => {
     if (data.token) {
+      toast.success('✅ Login successful! Reloading...');
       setToken(data.token); 
       localStorage.setItem("token", data.token);
+      setTimeout(() => window.location.reload(), 1000);
     }
   }
-
-  const handleClick = (item) => {
-    alert(`You clicked: ${item}`);
-  };
 
   return (
     <>
       <h2>Simple Library App</h2>
-      {!token && 
-        <>
-          <Auth onLogin={handleLogin} />
-        </>
+      {!token ? 
+        <Auth onLogin={handleLogin} />
+        :
+        <Logout />
       }
-      <Catalogue items={books} onItemClick={handleClick} />
+      <Catalogue items={books} />
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
     </>
   )
 }

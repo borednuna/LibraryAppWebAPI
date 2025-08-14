@@ -46,9 +46,9 @@ const BookService = {
     }
   },
 
-  update: async (id, data) => {
+  update: async (data) => {
     try {
-      const response = await api.put(`/${id}`, data);
+      const response = await api.put("", data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;

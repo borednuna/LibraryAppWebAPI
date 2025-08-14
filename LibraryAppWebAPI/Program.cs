@@ -27,7 +27,6 @@ builder.Services.AddIdentity<LibraryAppWebAPI.Models.Member, IdentityRole>()
     .AddEntityFrameworkStores<LibraryDbContext>()
     .AddDefaultTokenProviders();
 
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

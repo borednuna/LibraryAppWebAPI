@@ -6,7 +6,7 @@ using LibraryAppWebAPI.Models;
 using LibraryAppWebAPI.Enums;
 using Microsoft.AspNetCore.Identity;
 
-public class LibraryDbContext : IdentityDbContext<Member>  // remove custom Role
+public class LibraryDbContext : IdentityDbContext<Member> 
 {
     public DbSet<Book> Books { get; set; }
     public DbSet<BorrowingRecord> BorrowingRecords { get; set; }
@@ -43,7 +43,6 @@ public class LibraryDbContext : IdentityDbContext<Member>  // remove custom Role
                 .OnDelete(DeleteBehavior.SetNull);
         });
 
-        // Seed roles with IdentityRole
         modelBuilder.Entity<IdentityRole>().HasData(
             new IdentityRole
             {

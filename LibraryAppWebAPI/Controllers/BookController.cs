@@ -82,7 +82,7 @@ public class BookController(IBookService bookService, IValidator<BookDtoRequest>
     {
         if (!ModelState.IsValid)
         {
-            StatusCode(500, new { message = "Cannot register new user" });
+            StatusCode(500, new { message = "Cannot update booke" });
         }
 
         try
