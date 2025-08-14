@@ -3,7 +3,7 @@ using LibraryAppWebAPI.DTOs;
 
 namespace LibraryAppWebAPI.Validators;
 
-public class BookValidator : AbstractValidator<BookDto>
+public class BookValidator : AbstractValidator<BookDtoRequest>
 {
     public BookValidator()
     {

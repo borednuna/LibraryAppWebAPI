@@ -67,7 +67,7 @@ builder.Services.AddFluentValidationClientsideAdapters();
 
 builder.Services.AddTransient<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddTransient<IValidator<LoginDto>, LoginValidator>();
-builder.Services.AddTransient<IValidator<BookDto>, BookValidator>();
+builder.Services.AddTransient<IValidator<BookDtoRequest>, BookValidator>();
 
 builder.Services.AddControllers()
 .AddJsonOptions(options =>

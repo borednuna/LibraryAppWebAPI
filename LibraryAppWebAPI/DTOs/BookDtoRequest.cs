@@ -3,7 +3,7 @@ using LibraryAppWebAPI.Enums;
 
 namespace LibraryAppWebAPI.DTOs;
 
-public class BookDto
+public class BookDtoRequest
 {
     public int? Id { get; set; }
     public string? Image { get; set; }

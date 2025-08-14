@@ -8,9 +8,9 @@ public class BookMappingProfile : Profile
 {
     public BookMappingProfile()
     {
-        CreateMap<Book, BookDto>();
+        CreateMap<Book, BookDtoResponse>();
 
-        CreateMap<BookDto, Book>()
+        CreateMap<BookDtoRequest, Book>()
             .ForMember(dest => dest.Id, opt => opt.Ignore()) 
             .ForMember(dest => dest.BorrowingHistory, opt => opt.Ignore());
     }

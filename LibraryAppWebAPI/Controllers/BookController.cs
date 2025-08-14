@@ -9,13 +9,13 @@ namespace LibraryAppWebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BookController(IBookService bookService, IValidator<BookDto> bookValidator) : ControllerBase
+public class BookController(IBookService bookService, IValidator<BookDtoRequest> bookValidator) : ControllerBase
 {
     private readonly IBookService _bookService = bookService;
-    private readonly IValidator<BookDto> _bookValidator = bookValidator;
+    private readonly IValidator<BookDtoRequest> _bookValidator = bookValidator;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<BookDto>>> GetAllBooks()
+    public async Task<ActionResult<IEnumerable<BookDtoResponse>>> GetAllBooks()
     {
         try
         {
@@ -34,7 +34,7 @@ public class BookController(IBookService bookService, IValidator<BookDto> bookVa
 
     [HttpGet("{id}")]
     [Authorize]
-    public async Task<ActionResult<BookDto>> GetBookById(int id)
+    public async Task<ActionResult<BookDtoResponse>> GetBookById(int id)
     {
         try
         {
@@ -53,7 +53,7 @@ public class BookController(IBookService bookService, IValidator<BookDto> bookVa
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BookDto>> CreateBook(BookDto bookDto)
+    public async Task<ActionResult<BookDtoResponse>> CreateBook(BookDtoRequest bookDto)
     {
         if (!ModelState.IsValid)
         {
@@ -78,7 +78,7 @@ public class BookController(IBookService bookService, IValidator<BookDto> bookVa
 
     [HttpPut]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BookDto>> UpdateBook([FromBody] BookDto bookDto)
+    public async Task<ActionResult<BookDtoResponse>> UpdateBook([FromBody] BookDtoRequest bookDto)
     {
         if (!ModelState.IsValid)
         {
