@@ -1,31 +1,53 @@
-/* Floating bottom-left */
-.login-wrapper {
+.auth-wrapper {
   position: fixed;
   bottom: 20px;
   left: 20px;
-  width: 250px;          /* smaller width */
-  z-index: 100;          /* stays on top but not overlaying everything */
+  width: 250px;
+  z-index: 100;
 }
 
-.login-container {
+.auth-container {
   padding: 1rem;
   border-radius: 0.5rem;
   background-color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.login-container h2 {
+.tabs {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  transition: background 0.2s;
+}
+
+.tabs button.active {
+  background: #007bff;
+  color: rgb(77, 77, 77);
+  font-weight: bold;
+}
+
+.auth-container h2 {
   text-align: center;
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
   color: #333;
 }
 
-.login-container form div {
+.auth-container form div {
   margin-bottom: 0.8rem;
 }
 
-.login-container label {
+.auth-container label {
   display: block;
   margin-bottom: 0.3rem;
   font-weight: bold;
@@ -33,7 +55,7 @@
   color: #555;
 }
 
-.login-container input {
+.auth-container input {
   width: 80%;
   padding: 0.4rem;
   font-size: 0.8rem;
@@ -44,18 +66,18 @@
   color: #333;
 }
 
-.login-container input:focus {
+.auth-container input:focus {
   border-color: #007bff;
   outline: none;
   background-color: #fff;
 }
 
-.login-container button {
+.auth-container button[type="submit"] {
   width: 80%;
   padding: 8px;
   font-size: 0.85rem;
   font-weight: bold;
-  color: #fff;
+  color: #555555;
   background-color: #007bff;
   border: none;
   border-radius: 5px;
@@ -63,7 +85,7 @@
   transition: background-color 0.2s;
 }
 
-.login-container button:hover {
+.auth-container button[type="submit"]:hover {
   background-color: #0056b3;
 }
 

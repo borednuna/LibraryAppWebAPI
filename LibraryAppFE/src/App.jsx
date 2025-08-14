@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import Login from './components/Login/Login'
 import Catalogue from './components/catalogue/Catalogue';
 import BookService from './services/bookService';
-import Signup from './components/signup/signup';
+import Auth from './components/auth/Auth';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -40,8 +39,7 @@ function App() {
       <h2>Simple Library App</h2>
       {!token && 
         <>
-          <Login onLogin={handleLogin} />
-          <Signup />
+          <Auth onLogin={handleLogin} />
         </>
       }
       <Catalogue items={books} onItemClick={handleClick} />
